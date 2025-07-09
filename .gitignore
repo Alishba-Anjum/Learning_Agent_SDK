@@ -10,6 +10,3 @@ wheels/
 .venv
 .env
 
-git rm --cached .env
-git commit -m "Remove .env file from repository"
-git push origin main
