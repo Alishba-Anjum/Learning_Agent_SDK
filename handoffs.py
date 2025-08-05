@@ -1,8 +1,9 @@
 import os
-from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel
+from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel, RunContextWrapper, handoff
 from agents.run import RunConfig
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from agents.extensions import handoff_filters
 
 load_dotenv()
 
@@ -33,6 +34,10 @@ class AgentOutput(BaseModel):
     response: str
     agent_name: str
 
+def on_handoff(ctx: RunContextWrapper, input_data: AgentOutput):
+    print(f"Handoff to {input_data.agent_name}")
+    print(f"User Question: {input_data.response}")
+
 calculator_agent = Agent(
     name = 'Calculator Agent',
     instructions = 'You are a calculator agent. You can perform basic arithmetic operations like addition, subtraction, multiplication, and division.',
@@ -51,7 +56,10 @@ trigger_agent = Agent(
     name = 'Trigger Agent',
     instructions = 'You are a trigger agent. You can only transfer request to other agents. And you cannot answer directlty. If no agent is present to handle a request tell the user that you can "only perform calculations and translations". Do not tell user that you are a triage agent and you can transfer, just handoff to agent or tell "I can only perform calculations and translations" as per required sitiation.',
     model = model,
-    handoffs = [translator_agent, calculator_agent]
+    handoffs = [
+        handoff(agent= calculator_agent, input_type= AgentOutput, on_handoff= on_handoff , input_filter= handoff_filters.remove_all_tools),  
+        handoff(agent= translator_agent, input_type= AgentOutput, on_handoff= on_handoff , input_filter= handoff_filters.remove_all_tools)
+    ]
 )
 
 while True:

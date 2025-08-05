@@ -79,7 +79,7 @@ def divide(a:float, b:float) -> float:
 
 calculator_agent = Agent(
     name = 'Calculator Agent',
-    instructions = 'You are a calculator agent. You can perform basic arithmetic operations like addition, subtraction, multiplication, and division.',
+    instructions = 'You are a calculator agent. You can perform basic arithmetic operations like addition, subtraction, multiplication, and division. Use the tools provided to perform calculations.',
     model = model,
     tools = [add, substract, multiply, divide]
 )
