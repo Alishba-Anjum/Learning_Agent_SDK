@@ -24,25 +24,53 @@ config = RunConfig(
     tracing_disabled=True
 )
 
-@function_tool
-def get_joke() -> str:
-    print("get_joke tool called")
-    return "I'm a bot, I don't have a sense of humor."
+spanish_agent = Agent(
+    name="spanish_agent",
+    instructions="You translate the user's message to Spanish",
+    handoff_description="An english to spanish translator",
+)
 
+french_agent = Agent(
+    name="french_agent",
+    instructions="You translate the user's message to French",
+    handoff_description="An english to french translator",
+)
 
-Joke_Agent = Agent(
-    name='Joke Agent',
-    instructions='You are a Joke Agent. You can provide jokes to lighten the mood. Use the get_joke tool to fetch a joke.',
-    model=model,
-    tools=[get_joke]
+italian_agent = Agent(
+    name="italian_agent",
+    instructions="You translate the user's message to Italian",
+    handoff_description="An english to italian translator",
+)
+
+orchestrator_agent = Agent(
+    name="orchestrator_agent",
+    instructions=(
+        "You are a translation agent. You use the tools given to you to translate."
+        "If asked for multiple translations, you call the relevant tools in order."
+        "You never translate on your own, you always use the provided tools."
+    ),
+    tools=[
+        spanish_agent.as_tool(
+            tool_name="translate_to_spanish",
+            tool_description="Translate the user's message to Spanish",
+        ),
+        french_agent.as_tool(
+            tool_name="translate_to_french",
+            tool_description="Translate the user's message to French",
+        ),
+        italian_agent.as_tool(
+            tool_name="translate_to_italian",
+            tool_description="Translate the user's message to Italian",
+        ),
+    ],
 )
 
 while True:
-    user_input=input('User: ')
+    user_input = input("user: ")
     result = Runner.run_sync(
-        Joke_Agent,
+        orchestrator_agent,
         user_input,
-        run_config=config
-    )
+        run_config=config ,
+        )
 
-    print(f"Joke Agent: {result.final_output}")
+    print(f'Orchestrator-agent: {result.final_output}')
