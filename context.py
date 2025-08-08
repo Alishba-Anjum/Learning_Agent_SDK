@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel, function_tool, RunContextWrapper
 from agents.run import RunConfig
 
-# Load environment variables
+
 load_dotenv()
 
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
@@ -36,7 +36,7 @@ class WeatherContext:
 async def get_weather(ctx: RunContextWrapper[WeatherContext]) -> str:
     """Fetches weather for the user's location (mock data)."""
     location = ctx.context.location
-    fake_weather = random.choice(["Sunny ☀️", "Rainy 🌧️", "Cloudy ☁️", "Stormy ⛈️"])
+    fake_weather = random.choice(["Sunny ", "Rainy ", "Cloudy", "Stormy ", "Windy "])
     return f"The current weather in {location} is {fake_weather}."
 
 
